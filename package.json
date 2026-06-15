@@ -1,0 +1,10 @@
+{
+  "name": "com.gamedistrict.metica-genre-creator",
+  "version": "1.0.0",
+  "displayName": "GameDistrict Metica Genre Creator",
+  "description": "Runtime base classes and editor wizard for generating Metica analytics genre files. Requires the Metica Unity SDK.",
+  "unity": "2021.3",
+  "dependencies": {
+    "com.unity.nuget.newtonsoft-json": "3.2.1"
+  }
+}
