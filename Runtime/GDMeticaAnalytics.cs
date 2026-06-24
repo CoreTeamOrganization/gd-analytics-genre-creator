@@ -18,6 +18,9 @@ namespace GameDistrict.MeticaAnalytics
         [Tooltip("Leave empty to use SystemInfo.deviceUniqueIdentifier")]
         [SerializeField] private string userId    = "";
 
+        [Header("Debug")]
+        [SerializeField] private bool enableMeticaLogs = false;
+
         [Header("Adjust Information")]
         [SerializeField] private string adId      = "";
         [SerializeField] private string appToken  = "";
@@ -44,6 +47,7 @@ namespace GameDistrict.MeticaAnalytics
                 : !string.IsNullOrEmpty(userId) ? userId
                 : SystemInfo.deviceUniqueIdentifier;
 
+            MeticaSdk.SetLogEnabled(enableMeticaLogs);
             MeticaSdk.InitializeAnalytics(new MeticaInitConfig(apiKey, appId, resolvedUserId));
 #endif
         }
