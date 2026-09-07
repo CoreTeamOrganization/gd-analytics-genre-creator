@@ -161,6 +161,26 @@ namespace GameDistrict.MeticaAnalytics
             Debug.Log($"[MeticaAnalytics] LogCustomEvent: {eventName}\nProperties: {JsonConvert.SerializeObject(mergedProperties)}");
 #endif
         }
+
+        /// <summary>Logs a GDPerfTracker payload (see GDPerformanceTools) as the "perfStats" custom event.</summary>
+        public virtual void LogPerfStatsEvent(Dictionary<string, object>? customPayload)
+        {
+#if METICA_ANALYTICS
+            var mergedPayload = WithBaseFields(customPayload);
+            MeticaSdk.Analytics.LogCustomEvent("perfStats", mergedPayload);
+            Debug.Log($"[MeticaAnalytics] LogPerfStatsEvent\nPayload: {JsonConvert.SerializeObject(mergedPayload)}");
+#endif
+        }
+
+        /// <summary>Logs a GDStartupTime payload (see GDPerformanceTools) as the "loadTime" custom event.</summary>
+        public virtual void LogLoadTimeEvent(Dictionary<string, object>? customPayload)
+        {
+#if METICA_ANALYTICS
+            var mergedPayload = WithBaseFields(customPayload);
+            MeticaSdk.Analytics.LogCustomEvent("loadTime", mergedPayload);
+            Debug.Log($"[MeticaAnalytics] LogLoadTimeEvent\nPayload: {JsonConvert.SerializeObject(mergedPayload)}");
+#endif
+        }
         #endregion
     }
 }
