@@ -156,9 +156,9 @@ namespace GameDistrict.MeticaAnalytics
         public virtual void LogCustomEvent(string eventName, Dictionary<string, object>? properties)
         {
 #if METICA_ANALYTICS
-            MeticaSdk.Analytics.LogCustomEvent(eventName, properties);
-            var propertiesJson = properties != null ? JsonConvert.SerializeObject(new { properties }) : "null";
-            Debug.Log($"[MeticaAnalytics] LogCustomEvent: {eventName}\nProperties: {propertiesJson}");
+            var mergedProperties = WithBaseFields(properties);
+            MeticaSdk.Analytics.LogCustomEvent(eventName, mergedProperties);
+            Debug.Log($"[MeticaAnalytics] LogCustomEvent: {eventName}\nProperties: {JsonConvert.SerializeObject(mergedProperties)}");
 #endif
         }
         #endregion
