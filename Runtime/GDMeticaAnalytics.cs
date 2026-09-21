@@ -61,6 +61,29 @@ namespace GameDistrict.MeticaAnalytics
             this.appToken  = appToken;
         }
 
+        /// <summary>
+        /// Forwards to GDPerformance.Configure. Call once, after remote config is fetched;
+        /// overrides the GDPerfTracker prefab's Inspector defaults. No-op if GD Performance
+        /// Tracker isn't installed (see README).
+        /// </summary>
+        public void ConfigurePerformanceTracking(bool perfEnabled, float sampleIntervalSeconds = 1f, bool startupEnabled = false)
+        {
+#if GD_PERFORMANCE_TRACKER
+            GDPerformance.Configure(perfEnabled, sampleIntervalSeconds, startupEnabled);
+#endif
+        }
+
+        /// <summary>
+        /// Forwards to GDPerformance.MarkGameInteractive. Call once, the moment the game is
+        /// genuinely playable. Idempotent. No-op if GD Performance Tracker isn't installed.
+        /// </summary>
+        public void MarkGameInteractive()
+        {
+#if GD_PERFORMANCE_TRACKER
+            GDPerformance.MarkGameInteractive();
+#endif
+        }
+
         public virtual Dictionary<string, object> CreateBaseEvent()
         {
             return WithAbTestFields(new Dictionary<string, object>
@@ -80,8 +103,13 @@ namespace GameDistrict.MeticaAnalytics
 
         protected void MergeCustomFields(Dictionary<string, object> payload, AnalyticsEventData data)
         {
-            if (data.CustomFields == null) return;
-            foreach (var kvp in data.CustomFields)
+            MergeCustomFields(payload, data.CustomFields);
+        }
+
+        protected void MergeCustomFields(Dictionary<string, object> payload, Dictionary<string, object>? customFields)
+        {
+            if (customFields == null) return;
+            foreach (var kvp in customFields)
                 payload[kvp.Key] = kvp.Value;
         }
 
@@ -162,21 +190,47 @@ namespace GameDistrict.MeticaAnalytics
 #endif
         }
 
-        /// <summary>Logs a GDPerfTracker payload (see GDPerformanceTools) as the "perfStats" custom event.</summary>
-        public virtual void LogPerfStatsEvent(Dictionary<string, object>? customPayload)
+        /// <summary>
+        /// Logs the "perfStats" custom event. When GD Performance Tracker is installed, fetches
+        /// its perf payload (FPS/memory since the last call) and skips logging if tracking is off
+        /// or nothing was recorded; otherwise logs <paramref name="customPayload"/> as-is.
+        /// <paramref name="customPayload"/> always adds game-context fields (e.g. taskId, day) on top.
+        /// </summary>
+        public virtual void LogPerfStatsEvent(Dictionary<string, object>? customPayload = null)
         {
 #if METICA_ANALYTICS
-            var mergedPayload = WithBaseFields(customPayload);
+            Dictionary<string, object>? perfPayload;
+#if GD_PERFORMANCE_TRACKER
+            perfPayload = GDPerformance.ConsumePerfPayload();
+            if (perfPayload == null) return;
+            MergeCustomFields(perfPayload, customPayload);
+#else
+            perfPayload = customPayload;
+#endif
+            var mergedPayload = WithBaseFields(perfPayload);
             MeticaSdk.Analytics.LogCustomEvent("perfStats", mergedPayload);
             Debug.Log($"[MeticaAnalytics] LogPerfStatsEvent\nPayload: {JsonConvert.SerializeObject(mergedPayload)}");
 #endif
         }
 
-        /// <summary>Logs a GDStartupTime payload (see GDPerformanceTools) as the "loadTime" custom event.</summary>
-        public virtual void LogLoadTimeEvent(Dictionary<string, object>? customPayload)
+        /// <summary>
+        /// Logs the "loadTime" custom event. When GD Performance Tracker is installed, fetches its
+        /// cold-start payload and skips logging if startup tracking is off; otherwise logs
+        /// <paramref name="customPayload"/> as-is. <paramref name="customPayload"/> always adds
+        /// game-context fields on top.
+        /// </summary>
+        public virtual void LogLoadTimeEvent(Dictionary<string, object>? customPayload = null)
         {
 #if METICA_ANALYTICS
-            var mergedPayload = WithBaseFields(customPayload);
+            Dictionary<string, object>? startupPayload;
+#if GD_PERFORMANCE_TRACKER
+            startupPayload = GDPerformance.GetStartupPayload();
+            if (startupPayload == null) return;
+            MergeCustomFields(startupPayload, customPayload);
+#else
+            startupPayload = customPayload;
+#endif
+            var mergedPayload = WithBaseFields(startupPayload);
             MeticaSdk.Analytics.LogCustomEvent("loadTime", mergedPayload);
             Debug.Log($"[MeticaAnalytics] LogLoadTimeEvent\nPayload: {JsonConvert.SerializeObject(mergedPayload)}");
 #endif

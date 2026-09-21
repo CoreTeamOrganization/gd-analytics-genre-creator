@@ -3,7 +3,8 @@
     "rootNamespace": "GameDistrict.MeticaAnalytics",
     "references": [
         "Metica.SDK",
-        "MeticaAnalyticsAbstractions"
+        "MeticaAnalyticsAbstractions",
+        "GDPerformanceTracker.Runtime"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

@@ -6,32 +6,40 @@ using UnityEditor.Build;
 
 namespace GameDistrict.MeticaAnalytics.Editor
 {
-    // Adds METICA_ANALYTICS to Android and iOS when Metica SDK is installed.
+    // Adds METICA_ANALYTICS / GD_PERFORMANCE_TRACKER to Android and iOS when each SDK is installed.
     [InitializeOnLoad]
     internal static class MeticaSymbolInstaller
     {
-        private const string Symbol = "METICA_ANALYTICS";
+        private const string MeticaSymbol     = "METICA_ANALYTICS";
+        private const string PerfTrackerSymbol = "GD_PERFORMANCE_TRACKER";
 
         static MeticaSymbolInstaller()
         {
-            if (!IsMeticaSdkInstalled()) return;
-            AddSymbol(NamedBuildTarget.Android);
-            AddSymbol(NamedBuildTarget.iOS);
+            if (IsAssemblyLoaded("Metica.SDK"))
+            {
+                AddSymbol(NamedBuildTarget.Android, MeticaSymbol);
+                AddSymbol(NamedBuildTarget.iOS, MeticaSymbol);
+            }
+            if (IsAssemblyLoaded("GDPerformanceTracker.Runtime"))
+            {
+                AddSymbol(NamedBuildTarget.Android, PerfTrackerSymbol);
+                AddSymbol(NamedBuildTarget.iOS, PerfTrackerSymbol);
+            }
         }
 
-        private static bool IsMeticaSdkInstalled()
+        private static bool IsAssemblyLoaded(string assemblyName)
         {
             foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
-                if (assembly.GetName().Name == "Metica.SDK")
+                if (assembly.GetName().Name == assemblyName)
                     return true;
             return false;
         }
 
-        private static void AddSymbol(NamedBuildTarget target)
+        private static void AddSymbol(NamedBuildTarget target, string symbol)
         {
             PlayerSettings.GetScriptingDefineSymbols(target, out string[] symbols);
-            if (symbols.Contains(Symbol)) return;
-            var list = new List<string>(symbols) { Symbol };
+            if (symbols.Contains(symbol)) return;
+            var list = new List<string>(symbols) { symbol };
             PlayerSettings.SetScriptingDefineSymbols(target, list.ToArray());
         }
     }

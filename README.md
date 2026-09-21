@@ -7,11 +7,19 @@ Unity package for generating type-safe Metica analytics genre files from the Uni
 - Unity 2021.3+
 - [Metica Unity SDK](https://github.com/meticalabs/metica-unity-sdk) installed in your project
 - `com.unity.nuget.newtonsoft-json` 3.2.1 (pulled in automatically)
+- [GD Performance Tracker](https://github.com/CoreTeamOrganization/GDPerformanceTracker.git) — required only if you log the `perfStats` / `loadTime` events (see [Performance Events](#performance-events))
 - **Android builds only:** JDK 17+ and Gradle 8.6+ (Unity 2022.3 bundles Gradle 7.5.1 which is too old — see [Android Build Setup](#android-build-setup) below)
 
 ## Installation
 
-Add to your project's `Packages/manifest.json`:
+**In a shipping game, pin a released tag** — see [CHANGELOG.md](CHANGELOG.md) before upgrading,
+especially across a major version:
+
+```json
+"com.gamedistrict.metica-genre-creator": "https://github.com/CoreTeamOrganization/gd-analytics-genre-creator.git#v2.0.0"
+```
+
+For active co-development, a local reference works too, but never ships pinned to a version:
 
 ```json
 "com.gamedistrict.metica-genre-creator": "file:../path/to/com.gamedistrict.metica-genre-creator"
@@ -19,7 +27,46 @@ Add to your project's `Packages/manifest.json`:
 
 Or place the folder inside your project's `Packages/` directory directly.
 
-> The `METICA_ANALYTICS` scripting define symbol is added automatically to Android and iOS as soon as the Metica SDK is detected in the project.
+### Performance Events
+
+`LogPerfStatsEvent` and `LogLoadTimeEvent` log payloads produced by [GD Performance Tracker](https://github.com/CoreTeamOrganization/GDPerformanceTracker.git). UPM does not resolve git URLs listed in a package's `dependencies`, so it ships as a separate package alongside this one.
+
+The first time this package loads in a project without it, a popup offers to add it via `Client.Add` — click **Add Package**, or **Not Now** to skip (asked once per Editor session). To add it manually instead — **Package Manager → `+` → Add package from git URL…**: 
+
+```
+https://github.com/CoreTeamOrganization/GDPerformanceTracker.git
+```
+
+or add to `Packages/manifest.json`:
+
+```json
+"com.gamedistrict.performance-tracker": "https://github.com/CoreTeamOrganization/GDPerformanceTracker.git#v1.3.0"
+```
+
+Once installed, `GDMeticaAnalytics` wires the tracker's API for you — it fetches each payload
+internally and skips logging when the tracker returns null (tracking off / nothing recorded):
+
+```csharp
+// Once, after remote config is fetched — overrides the GDPerfTracker prefab's Inspector defaults:
+analytics.ConfigurePerformanceTracking(perfEnabled, sampleIntervalSeconds, startupEnabled);
+
+// Once, the moment the game is genuinely playable:
+analytics.MarkGameInteractive();
+
+// At your chosen logging moment — customPayload adds game-context fields (taskId, day, ...):
+analytics.LogPerfStatsEvent(customPayload);
+
+// When logging cold start:
+analytics.LogLoadTimeEvent(customPayload);
+```
+
+> If your game already calls `GDPerformance.ConsumePerfPayload()` / `GetStartupPayload()` itself
+> and passes the result straight into `LogPerfStatsEvent` / `LogLoadTimeEvent`, don't upgrade to
+> this version without updating that call site — these methods now fetch internally, so the
+> caller's own fetch would consume the window first and the internal fetch would come back null.
+
+> Both the `METICA_ANALYTICS` and `GD_PERFORMANCE_TRACKER` scripting define symbols are added
+> automatically to Android and iOS as soon as each SDK is detected in the project.
 
 ---
 
