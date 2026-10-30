@@ -6,14 +6,12 @@ namespace GameDistrict.MeticaAnalytics.Editor
 {
     internal static class GenreCodeGenerator
     {
-        private const string Ns = "GameDistrict.MeticaAnalytics";
-
         public static string Interface(string genre, List<GenreEventDef> events)
         {
             var sb = new StringBuilder();
-            sb.AppendLine($"namespace {Ns}");
+            sb.AppendLine($"namespace {GenreHost.Ns}");
             sb.AppendLine("{");
-            sb.AppendLine($"    public interface I{genre}Analytics");
+            sb.AppendLine($"    public interface I{genre}Analytics{GenreHost.InterfaceBase}");
             sb.AppendLine("    {");
             foreach (var evt in events)
                 sb.AppendLine($"        void {evt.Name}({genre}{evt.Name} data);");
@@ -25,7 +23,7 @@ namespace GameDistrict.MeticaAnalytics.Editor
         public static string Data(string genre, List<GenreEventDef> events)
         {
             var sb = new StringBuilder();
-            sb.AppendLine($"namespace {Ns}");
+            sb.AppendLine($"namespace {GenreHost.Ns}");
             sb.AppendLine("{");
             foreach (var evt in events)
             {
@@ -58,15 +56,13 @@ namespace GameDistrict.MeticaAnalytics.Editor
             var sb = new StringBuilder();
             sb.AppendLine("using UnityEngine;");
             sb.AppendLine();
-            sb.AppendLine($"namespace {Ns}");
+            sb.AppendLine($"namespace {GenreHost.Ns}");
             sb.AppendLine("{");
-            sb.AppendLine($"    [CreateAssetMenu(fileName = \"{genre}Analytics\", menuName = \"MeticaAnalytics/{genre}\")]");
+            sb.AppendLine($"    [CreateAssetMenu(fileName = \"{genre}Analytics\", menuName = \"{GenreHost.ImplAssetMenu}{genre}\")]");
             sb.AppendLine($"    public class {genre}Analytics : GDMeticaAnalytics, I{genre}Analytics");
             sb.AppendLine("    {");
-            sb.AppendLine($"        private static {genre}Analytics _instance;");
-            sb.AppendLine($"        public static {genre}Analytics Instance =>");
-            sb.AppendLine($"            _instance != null ? _instance : (_instance = Resources.Load<{genre}Analytics>(\"{genre}Analytics\"));");
-            sb.AppendLine();
+            foreach (var line in GenreHost.ImplMembers(genre))
+                sb.AppendLine(line);
             foreach (var evt in events)
             {
                 sb.AppendLine($"        public void {evt.Name}({genre}{evt.Name} data)");

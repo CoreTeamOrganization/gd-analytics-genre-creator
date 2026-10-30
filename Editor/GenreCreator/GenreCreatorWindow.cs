@@ -22,12 +22,11 @@ namespace GameDistrict.MeticaAnalytics.Editor
         private List<string> _sheetNames    = new();
         private int          _selectedSheet = 0;
 
-        // ── Menu ──────────────────────────────────────────────────────────────
-        [MenuItem("GameDistrict/Metica Analytics/Create New Genre...", false, 20)]
+        // The menu item lives in GenreHost.Editor.cs (host-owned) so each host picks its own menu path.
         public static void ShowWindow()
         {
             var w = GetWindow<GenreCreatorWindow>("Genre Creator");
-            w.minSize = new Vector2(460, 540);
+            w.minSize = new Vector2(460, GenreHost.MinWindowHeight);
             w.Show();
         }
 
@@ -75,7 +74,7 @@ namespace GameDistrict.MeticaAnalytics.Editor
             {
                 EditorGUILayout.HelpBox(
                     "Fill in the genre name and define its events, then click Create Genre Files.\n" +
-                    "After Unity recompiles, the assets are created automatically at Assets/MeticaGenres/Resources.",
+                    GenreHost.AfterCreateHelp,
                     MessageType.None);
                 EditorGUILayout.Space(6);
             }
@@ -86,6 +85,7 @@ namespace GameDistrict.MeticaAnalytics.Editor
             EditorGUILayout.Space(8);
             DrawStatus();
             DrawCreateButton();
+            GenreHost.DrawExtraSection(_genreName, SetStatus);
         }
 
         private void DrawModeTabs()

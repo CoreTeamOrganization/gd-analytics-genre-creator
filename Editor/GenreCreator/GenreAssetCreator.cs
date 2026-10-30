@@ -11,9 +11,9 @@ namespace GameDistrict.MeticaAnalytics.Editor
 {
     internal static class GenreAssetCreator
     {
-        internal const string PendingGenreKey = "GDMeticaAnalytics_PendingGenre";
-        internal const string ScriptsBase     = "Assets/MeticaGenres";
-        internal const string ResourcesPath   = "Assets/MeticaGenres/Resources";
+        internal const string PendingGenreKey = GenreHost.PendingGenreKey;
+        internal const string ScriptsBase     = GenreHost.ScriptsBase;
+        internal const string ResourcesPath   = GenreHost.ResourcesPath;
 
         public static void CreateFiles(string genre, List<GenreEventDef> events)
         {
@@ -25,6 +25,8 @@ namespace GameDistrict.MeticaAnalytics.Editor
             WriteFile(dir, $"I{genre}Analytics.cs", GenreCodeGenerator.Interface(genre, events));
             WriteFile(dir, $"{genre}Data.cs",        GenreCodeGenerator.Data(genre, events));
             WriteFile(dir, $"{genre}Analytics.cs",   GenreCodeGenerator.Implementation(genre, events));
+            foreach (var (file, content) in GenreHost.ExtraFiles(genre))
+                WriteFile(dir, file, content);
 
             EditorPrefs.SetString(PendingGenreKey, genre);
             AssetDatabase.Refresh();
@@ -42,7 +44,7 @@ namespace GameDistrict.MeticaAnalytics.Editor
             var analyticsType = FindType($"{genre}Analytics");
             if (analyticsType == null)
             {
-                Debug.LogError($"[MeticaGenreCreator] Could not find type '{genre}Analytics'. " +
+                Debug.LogError($"{GenreHost.LogTag} Could not find type '{genre}Analytics'. " +
                                "Make sure there are no compile errors.");
                 return;
             }
@@ -50,20 +52,14 @@ namespace GameDistrict.MeticaAnalytics.Editor
             string analyticsPath  = $"{ResourcesPath}/{genre}Analytics.asset";
             var    analyticsAsset = ScriptableObject.CreateInstance(analyticsType);
             AssetDatabase.CreateAsset(analyticsAsset, analyticsPath);
+            GenreHost.OnAnalyticsAssetCreated(genre, analyticsAsset);
 
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
 
-            Debug.Log($"[MeticaGenreCreator] '{genre}' asset created at {analyticsPath}");
+            Debug.Log($"{GenreHost.LogTag} '{genre}' created under {ResourcesPath}");
 
-            EditorUtility.DisplayDialog(
-                "Genre Created!",
-                $"'{genre}' scripts and asset are ready.\n\n" +
-                $"Asset: {analyticsPath}\n\n" +
-                "1. Assign the asset to your game.\n" +
-                "2. Fill in App Id, Api Key.\n" +
-                "3. Call analytics.Initialize() once at startup.",
-                "OK");
+            EditorUtility.DisplayDialog("Genre Created!", GenreHost.DoneMessage(genre, analyticsPath), "OK");
         }
 
         internal static string ProjectRoot()

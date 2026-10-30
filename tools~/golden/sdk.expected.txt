@@ -1,0 +1,194 @@
+===== Arcade/Interface
+namespace Monetization.Runtime.Analytics
+{
+    public interface IArcadeAnalytics : IGDMeticaAnalytics
+    {
+        void LevelStarted(ArcadeLevelStarted data);
+        void LevelFinished(ArcadeLevelFinished data);
+        void AppBackgrounded(ArcadeAppBackgrounded data);
+    }
+}
+
+===== Arcade/Data
+namespace Monetization.Runtime.Analytics
+{
+    public class ArcadeLevelStarted : AnalyticsEventData
+    {
+        public int Level { get; }
+        public string LevelType { get; }
+
+        public ArcadeLevelStarted(int level, string levelType)
+        {
+            Level = level;
+            LevelType = levelType;
+        }
+    }
+
+    public class ArcadeLevelFinished : AnalyticsEventData
+    {
+        public bool Success { get; }
+        public float Duration { get; }
+        public string Reward { get; }
+
+        public ArcadeLevelFinished(bool success, float duration, string reward)
+        {
+            Success = success;
+            Duration = duration;
+            Reward = reward;
+        }
+    }
+
+    public class ArcadeAppBackgrounded : AnalyticsEventData
+    {
+    }
+
+}
+
+===== Arcade/Implementation
+using UnityEngine;
+
+namespace Monetization.Runtime.Analytics
+{
+    [CreateAssetMenu(fileName = "ArcadeAnalytics", menuName = "GDMonetization/MeticaAnalytics/ScriptSO/Arcade")]
+    public class ArcadeAnalytics : GDMeticaAnalytics, IArcadeAnalytics
+    {
+        public void LevelStarted(ArcadeLevelStarted data)
+        {
+            var payload = CreateBaseEvent();
+            payload["Level"] = data.Level;
+            payload["LevelType"] = data.LevelType;
+            MergeCustomFields(payload, data);
+            LogCustomEvent("levelStarted", payload);
+        }
+
+        public void LevelFinished(ArcadeLevelFinished data)
+        {
+            var payload = CreateBaseEvent();
+            payload["Success"] = data.Success;
+            payload["Duration"] = data.Duration;
+            payload["reward_Amount"] = data.Reward;
+            MergeCustomFields(payload, data);
+            LogCustomEvent("levelFinished", payload);
+        }
+
+        public void AppBackgrounded(ArcadeAppBackgrounded data)
+        {
+            var payload = CreateBaseEvent();
+            MergeCustomFields(payload, data);
+            LogCustomEvent("appBackgrounded", payload);
+        }
+
+    }
+}
+
+===== Arcade/Extra ArcadeAnalyticsSO.cs
+using UnityEngine;
+
+namespace Monetization.Runtime.Analytics
+{
+    [CreateAssetMenu(fileName = "ArcadeAnalyticsSO", menuName = "GDMonetization/MeticaAnalytics/GenreSO/Arcade")]
+    public class ArcadeAnalyticsSO : AnalyticsGenreSO
+    {
+        [SerializeField] private ArcadeAnalytics _arcadeAnalytics;
+
+        public override GDMeticaAnalytics GetAnalytics() => _arcadeAnalytics ??= new ArcadeAnalytics();
+    }
+}
+
+===== puzzleGame/Interface
+namespace Monetization.Runtime.Analytics
+{
+    public interface IpuzzleGameAnalytics : IGDMeticaAnalytics
+    {
+        void LevelStarted(puzzleGameLevelStarted data);
+        void LevelFinished(puzzleGameLevelFinished data);
+        void AppBackgrounded(puzzleGameAppBackgrounded data);
+    }
+}
+
+===== puzzleGame/Data
+namespace Monetization.Runtime.Analytics
+{
+    public class puzzleGameLevelStarted : AnalyticsEventData
+    {
+        public int Level { get; }
+        public string LevelType { get; }
+
+        public puzzleGameLevelStarted(int level, string levelType)
+        {
+            Level = level;
+            LevelType = levelType;
+        }
+    }
+
+    public class puzzleGameLevelFinished : AnalyticsEventData
+    {
+        public bool Success { get; }
+        public float Duration { get; }
+        public string Reward { get; }
+
+        public puzzleGameLevelFinished(bool success, float duration, string reward)
+        {
+            Success = success;
+            Duration = duration;
+            Reward = reward;
+        }
+    }
+
+    public class puzzleGameAppBackgrounded : AnalyticsEventData
+    {
+    }
+
+}
+
+===== puzzleGame/Implementation
+using UnityEngine;
+
+namespace Monetization.Runtime.Analytics
+{
+    [CreateAssetMenu(fileName = "puzzleGameAnalytics", menuName = "GDMonetization/MeticaAnalytics/ScriptSO/puzzleGame")]
+    public class puzzleGameAnalytics : GDMeticaAnalytics, IpuzzleGameAnalytics
+    {
+        public void LevelStarted(puzzleGameLevelStarted data)
+        {
+            var payload = CreateBaseEvent();
+            payload["Level"] = data.Level;
+            payload["LevelType"] = data.LevelType;
+            MergeCustomFields(payload, data);
+            LogCustomEvent("levelStarted", payload);
+        }
+
+        public void LevelFinished(puzzleGameLevelFinished data)
+        {
+            var payload = CreateBaseEvent();
+            payload["Success"] = data.Success;
+            payload["Duration"] = data.Duration;
+            payload["reward_Amount"] = data.Reward;
+            MergeCustomFields(payload, data);
+            LogCustomEvent("levelFinished", payload);
+        }
+
+        public void AppBackgrounded(puzzleGameAppBackgrounded data)
+        {
+            var payload = CreateBaseEvent();
+            MergeCustomFields(payload, data);
+            LogCustomEvent("appBackgrounded", payload);
+        }
+
+    }
+}
+
+===== puzzleGame/Extra puzzleGameAnalyticsSO.cs
+using UnityEngine;
+
+namespace Monetization.Runtime.Analytics
+{
+    [CreateAssetMenu(fileName = "puzzleGameAnalyticsSO", menuName = "GDMonetization/MeticaAnalytics/GenreSO/puzzleGame")]
+    public class puzzleGameAnalyticsSO : AnalyticsGenreSO
+    {
+        [SerializeField] private puzzleGameAnalytics _puzzleGameAnalytics;
+
+        public override GDMeticaAnalytics GetAnalytics() => _puzzleGameAnalytics ??= new puzzleGameAnalytics();
+    }
+}
+

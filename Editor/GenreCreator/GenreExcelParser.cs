@@ -158,7 +158,7 @@ namespace GameDistrict.MeticaAnalytics.Editor
         private static HashSet<string> BuildCoreEventNames()
         {
             var result = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-            foreach (var method in typeof(GDMeticaAnalytics).GetMethods())
+            foreach (var method in GenreHost.CoreEventsType.GetMethods())
             {
                 string n = method.Name;
                 if (n.StartsWith("Log") && n.EndsWith("Event") && n.Length > 8)

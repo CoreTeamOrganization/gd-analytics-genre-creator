@@ -7,6 +7,15 @@ Pin your project's `Packages/manifest.json` to a released tag —
 `https://github.com/CoreTeamOrganization/gd-analytics-genre-creator.git#vX.Y.Z` — never track
 `main` directly. `main` can carry changes ahead of what's released and documented here.
 
+## [Unreleased]
+
+### Changed
+- Internal refactor, no behaviour change: everything that differs between this package and the GDMonetization
+  SDK now lives in `Editor/GenreCreator/GenreHost.cs` + `GenreHost.Editor.cs`; the rest of `Editor/GenreCreator`
+  is shared core, vendored into the SDK by `tools~/sync-to-sdk.sh` (see `.claude/skills/sync-genre-creator`).
+  Generated genre code is byte-identical (checked by `tools~/golden/golden.sh`).
+- The window's menu item moved from `GenreCreatorWindow` to `GenreHost.Editor.cs`; the menu path is unchanged.
+
 ## [2.1.0] - 2026-10-30
 
 ### Added
