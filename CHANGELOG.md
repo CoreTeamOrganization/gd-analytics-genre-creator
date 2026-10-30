@@ -7,6 +7,12 @@ Pin your project's `Packages/manifest.json` to a released tag —
 `https://github.com/CoreTeamOrganization/gd-analytics-genre-creator.git#vX.Y.Z` — never track
 `main` directly. `main` can carry changes ahead of what's released and documented here.
 
+## [2.1.0] - 2026-10-30
+
+### Added
+- `UpdateFirebaseInfo(appInstanceId)` — every event now carries a `firebaseAppInstanceId` param
+  (empty string until set). The genre-creator wizard skips it as a reserved param.
+
 ## [2.0.0] - 2026-09-21
 
 ### Changed (BREAKING)

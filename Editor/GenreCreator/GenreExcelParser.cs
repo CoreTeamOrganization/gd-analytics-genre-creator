@@ -11,7 +11,7 @@ namespace GameDistrict.MeticaAnalytics.Editor
     internal static class GenreExcelParser
     {
         private static readonly HashSet<string> SkipParams = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
-        { "adid", "appToken", "abTest", "abGroup", "abTestStartDate" };
+        { "adid", "appToken", "firebaseAppInstanceId", "abTest", "abGroup", "abTestStartDate" };
 
         private static readonly HashSet<string> SkipEvents = BuildCoreEventNames();
 

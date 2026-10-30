@@ -24,6 +24,7 @@ namespace GameDistrict.MeticaAnalytics
         [Header("Adjust Information")]
         [SerializeField] private string adId      = "";
         [SerializeField] private string appToken  = "";
+        private string firebaseAppInstanceId = "";
 
         public string? AbTest          { get; set; } = null;
         public string? AbGroup         { get; set; } = null;
@@ -62,6 +63,14 @@ namespace GameDistrict.MeticaAnalytics
         }
 
         /// <summary>
+        /// Set the Firebase app instance ID once Firebase resolves it, so events can be joined to Adjust/Firebase data.
+        /// </summary>
+        public void UpdateFirebaseInfo(string appInstanceId)
+        {
+            firebaseAppInstanceId = appInstanceId;
+        }
+
+        /// <summary>
         /// Forwards to GDPerformance.Configure. Call once, after remote config is fetched;
         /// overrides the GDPerfTracker prefab's Inspector defaults. No-op if GD Performance
         /// Tracker isn't installed (see README).
@@ -90,6 +99,7 @@ namespace GameDistrict.MeticaAnalytics
             {
                 { "adid",      adId },
                 { "appToken", appToken },
+                { "firebaseAppInstanceId", firebaseAppInstanceId },
             });
         }
 
@@ -119,6 +129,7 @@ namespace GameDistrict.MeticaAnalytics
             {
                 { "adid",      adId },
                 { "appToken", appToken },
+                { "firebaseAppInstanceId", firebaseAppInstanceId },
             };
             if (payload != null)
                 foreach (var kvp in payload)

@@ -153,6 +153,7 @@ Every event your genre class sends (level started, level finished, etc.) automat
 |---|---|
 | `adid` | Adjust ad ID (empty string if not set) |
 | `appToken` | Adjust app token (empty string if not set) |
+| `firebaseAppInstanceId` | Firebase app instance ID (empty string until `UpdateFirebaseInfo()` is called) |
 | `abTest` | A/B test name (omitted if not set) |
 | `abGroup` | A/B test variant (omitted if not set) |
 | `abTestStartDate` | A/B test start date (omitted if not set) |
@@ -317,6 +318,15 @@ Adjust.GetAdid(adid =>
 ```
 
 This updates the `adId` and `appToken` stored on the asset. All subsequent events will include the resolved values.
+
+Likewise, once Firebase resolves its instance ID, pass it with `UpdateFirebaseInfo()` so every event carries `firebaseAppInstanceId`:
+
+```csharp
+FirebaseAnalytics.GetAnalyticsInstanceIdAsync().ContinueWithOnMainThread(t =>
+{
+    if (!t.IsFaulted && !t.IsCanceled) _analytics.UpdateFirebaseInfo(t.Result);
+});
+```
 
 ---
 
