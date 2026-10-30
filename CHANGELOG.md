@@ -7,7 +7,7 @@ Pin your project's `Packages/manifest.json` to a released tag —
 `https://github.com/CoreTeamOrganization/gd-analytics-genre-creator.git#vX.Y.Z` — never track
 `main` directly. `main` can carry changes ahead of what's released and documented here.
 
-## [Unreleased]
+## [2.1.1] - 2026-10-30
 
 ### Changed
 - Internal refactor, no behaviour change: everything that differs between this package and the GDMonetization
